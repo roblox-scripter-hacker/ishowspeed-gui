@@ -1,0 +1,255 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+
+local Player = Players.LocalPlayer
+
+local Character = Player.Character or Player.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+local HRP = Character:WaitForChild("HumanoidRootPart")
+
+Player.CharacterAdded:Connect(function(Char)
+	Character = Char
+	Humanoid = Char:WaitForChild("Humanoid")
+	HRP = Char:WaitForChild("HumanoidRootPart")
+end)
+
+local Flying = false
+local SpeedEnabled = false
+local NoclipEnabled = false
+local BodyHere's the **all-in-one Roblox LocalScript** with:
+
+✅ iShowSpeed Hub  
+✅ Fly Toggle  
+✅ Fly Speed Box (labeled)  
+✅ Walk Speed Toggle  
+✅ Walk Speed Box (labeled)  
+✅ Noclip Toggle  
+✅ Draggable GUI  
+✅ Scrollable GUI  
+✅ Green Theme  
+✅ Open Button  
+✅ Close Button (Deletes GUI)
+
+```lua
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+
+local Player = Players.LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+local RootPart = Character:WaitForChild("HumanoidRootPart")
+
+local Flying = false
+local Noclip = false
+local SpeedEnabled = false
+local FlyVelocity
+
+local GUI = Instance.new("ScreenGui")
+GUI.Name = "iShowSpeedHub"
+GUI.ResetOnSpawn = false
+GUI.Parent = Player.PlayerGui
+
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0,320,0,400)
+Frame.Position = UDim2.new(0.35,0,0.2,0)
+Frame.BackgroundColor3 = Color3.fromRGB(0,170,0)
+Frame.BorderSizePixel = 0
+Frame.Active = true
+Frame.Draggable = true
+Frame.Parent = GUI
+
+Instance.new("UICorner", Frame)
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1,0,0,35)
+Title.BackgroundTransparency = 1
+Title.Text = "⚡ iShowSpeed Hub ⚡"
+Title.TextColor3 = Color3.new(1,1,1)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 20
+Title.Parent = Frame
+
+local CloseButton = Instance.new("TextButton")
+CloseButton.Size = UDim2.new(0,30,0,30)
+CloseButton.Position = UDim2.new(1,-35,0,3)
+CloseButton.Text = "X"
+CloseButton.BackgroundColor3 = Color3.fromRGB(0,120,0)
+CloseButton.TextColor3 = Color3.new(1,1,1)
+CloseButton.Parent = Frame
+
+Instance.new("UICorner", CloseButton)
+
+local Scroll = Instance.new("ScrollingFrame")
+Scroll.Size = UDim2.new(1,-10,1,-45)
+Scroll.Position = UDim2.new(0,5,0,40)
+Scroll.CanvasSize = UDim2.new(0,0,0,700)
+Scroll.BackgroundTransparency = 1
+Scroll.ScrollBarThickness = 8
+Scroll.Parent = Frame
+
+local Layout = Instance.new("UIListLayout")
+Layout.Padding = UDim.new(0,5)
+Layout.Parent = Scroll
+
+Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+	Scroll.CanvasSize = UDim2.new(0,0,0,Layout.AbsoluteContentSize.Y + 10)
+end)
+
+local function CreateLabel(Text)
+	local Label = Instance.new("TextLabel")
+	Label.Size = UDim2.new(1,-10,0,20)
+	Label.BackgroundTransparency = 1
+	Label.Text = Text
+	Label.TextColor3 = Color3.new(1,1,1)
+	Label.TextXAlignment = Enum.TextXAlignment.Left
+	Label.Font = Enum.Font.GothamBold
+	Label.TextSize = 14
+	Label.Parent = Scroll
+end
+
+local function CreateBox(Default)
+	local Box = Instance.new("TextBox")
+	Box.Size = UDim2.new(1,-10,0,40)
+	Box.BackgroundColor3 = Color3.fromRGB(0,120,0)
+	Box.TextColor3 = Color3.new(1,1,1)
+	Box.Text = Default
+	Box.Font = Enum.Font.Gotham
+	Box.TextSize = 16
+	Box.Parent = Scroll
+	Instance.new("UICorner", Box)
+	return Box
+end
+
+local function CreateButton(Text)
+	local Button = Instance.new("TextButton")
+	Button.Size = UDim2.new(1,-10,0,40)
+	Button.BackgroundColor3 = Color3.fromRGB(0,120,0)
+	Button.TextColor3 = Color3.new(1,1,1)
+	Button.Text = Text
+	Button.Font = Enum.Font.GothamBold
+	Button.TextSize = 16
+	Button.Parent = Scroll
+	Instance.new("UICorner", Button)
+	return Button
+end
+
+CreateLabel("🚀 Fly Speed")
+local FlySpeedBox = CreateBox("50")
+local FlyButton = CreateButton("Fly OFF")
+
+CreateLabel("🏃 Walk Speed")
+local WalkSpeedBox = CreateBox("16")
+local SpeedButton = CreateButton("Speed OFF")
+
+local NoclipButton = CreateButton("Noclip OFF")
+
+RunService.Stepped:Connect(function()
+	if Noclip and Character then
+		for _,v in pairs(Character:GetDescendants()) do
+			if v:IsA("BasePart") then
+				v.CanCollide = false
+			end
+		end
+	end
+end)
+
+FlyButton.MouseButton1Click:Connect(function()
+
+	Flying = not Flying
+
+	if Flying then
+
+		FlyButton.Text = "Fly ON"
+
+		local FlySpeed = tonumber(FlySpeedBox.Text) or 50
+
+		FlyVelocity = Instance.new("BodyVelocity")
+		FlyVelocity.MaxForce = Vector3.new(9e9,9e9,9e9)
+		FlyVelocity.Parent = RootPart
+
+		task.spawn(function()
+			while Flying and FlyVelocity do
+
+				local Direction = Vector3.zero
+
+				if UIS:IsKeyDown(Enum.KeyCode.W) then
+					Direction += workspace.CurrentCamera.CFrame.LookVector
+				end
+
+				if UIS:IsKeyDown(Enum.KeyCode.S) then
+					Direction -= workspace.CurrentCamera.CFrame.LookVector
+				end
+
+				if UIS:IsKeyDown(Enum.KeyCode.A) then
+					Direction -= workspace.CurrentCamera.CFrame.RightVector
+				end
+
+				if UIS:IsKeyDown(Enum.KeyCode.D) then
+					Direction += workspace.CurrentCamera.CFrame.RightVector
+				end
+
+				if UIS:IsKeyDown(Enum.KeyCode.Space) then
+					Direction += Vector3.new(0,1,0)
+				end
+
+				if UIS:IsKeyDown(Enum.KeyCode.LeftControl) then
+					Direction -= Vector3.new(0,1,0)
+				end
+
+				if Direction.Magnitude > 0 then
+					FlyVelocity.Velocity = Direction.Unit * FlySpeed
+				else
+					FlyVelocity.Velocity = Vector3.zero
+				end
+
+				task.wait()
+			end
+		end)
+
+	else
+
+		FlyButton.Text = "Fly OFF"
+
+		if FlyVelocity then
+			FlyVelocity:Destroy()
+			FlyVelocity = nil
+		end
+	end
+end)
+
+SpeedButton.MouseButton1Click:Connect(function()
+
+	SpeedEnabled = not SpeedEnabled
+
+	if SpeedEnabled then
+		Humanoid.WalkSpeed = tonumber(WalkSpeedBox.Text) or 16
+		SpeedButton.Text = "Speed ON"
+	else
+		Humanoid.WalkSpeed = 16
+		SpeedButton.Text = "Speed OFF"
+	end
+end)
+
+NoclipButton.MouseButton1Click:Connect(function()
+
+	Noclip = not Noclip
+
+	if Noclip then
+		NoclipButton.Text = "Noclip ON"
+	else
+		NoclipButton.Text = "Noclip OFF"
+	end
+end)
+
+CloseButton.MouseButton1Click:Connect(function()
+	GUI:Destroy()
+	script:Destroy()
+end)
+
+Player.CharacterAdded:Connect(function(Char)
+	Character = Char
+	Humanoid = Char:WaitForChild("Humanoid")
+	RootPart = Char:WaitForChild("HumanoidRootPart")
+end)
